@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QLinearGradient, QColor, QPen
-from PySide6.QtWidgets import QStyleOptionSlider
+from PySide6.QtWidgets import QStyleOptionSlider, QStyle
 
 from ui.controls.smart_slider import SmartSlider
 
@@ -40,7 +40,7 @@ class GradientSlider(SmartSlider):
         painter.setBrush(gradient)
         painter.drawRoundedRect(left, groove_y, right-left, groove_h, 4, 4)
 
-        length = self.style().pixelMetric(self.style().PixelMetric.PM_SliderLength, option, self)
+        length = self.style().pixelMetric(QStyle.PixelMetric.PM_SliderLength, option, self)
         available = max(1, self.width() - length)
         x = int((self.value() - self.minimum()) / max(1, self.maximum() - self.minimum()) * available + length / 2)
         painter.setBrush(self.palette().base())
