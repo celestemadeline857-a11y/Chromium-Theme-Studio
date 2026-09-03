@@ -1,4 +1,4 @@
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QButtonGroup, QFileDialog, QFormLayout, QFrame, QHBoxLayout, QLabel, QLineEdit, QPlainTextEdit, QRadioButton, QPushButton, QVBoxLayout, QWidget
 import os
 
@@ -12,7 +12,7 @@ class ExportPage(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(36, 28, 36, 28)
         layout.setSpacing(18)
-        layout.setAlignment(0x0020)  # AlignTop without a hard dependency on enum aliases.
+        layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         title = QLabel("Export Theme Package")
         title.setProperty("class", "pageTitle")
