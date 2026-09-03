@@ -1,80 +1,46 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTextBrowser
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QVBoxLayout, QTextBrowser, QWidget
+
 
 class HelpPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(40, 30, 40, 30)
-        
-        lbl = QTextBrowser()
-        lbl.setOpenExternalLinks(True)
-        # Fix: Removed hardcoded 'color' attributes so text inherits from the AppStyles stylesheet.
-        # Added explicit color for .key to ensure readability on its specific background.
-        lbl.setHtml("""
-        <style>
-            h1 { font-weight: bold; margin-bottom: 5px; }
-            h3 { margin-top: 20px; border-bottom: 1px solid #888; padding-bottom: 5px; }
-            p, li { font-size: 13px; line-height: 1.6; }
-            b { font-weight: bold; }
-            .key { 
-                color: #000000; 
-                background-color: #eeeeee; 
-                border: 1px solid #cccccc; 
-                border-radius: 3px; 
-                padding: 0 4px; 
-                font-family: monospace; 
-            }
-        </style>
-        
-        <h1>Chromium Theme Studio V2</h1>
-        <p>Welcome! This tool allows you to design and export professional themes for Chrome, Brave, Edge, and other Chromium browsers.</p>
-        
-        <h3>🛠️ How to Use</h3>
+        layout.setContentsMargins(36, 28, 36, 28)
+        browser = QTextBrowser()
+        browser.setOpenExternalLinks(True)
+        browser.setHtml("""
+        <h1>Chromium Theme Studio v3</h1>
+        <p>Design and export Chromium browser themes with a live, browser-style preview.</p>
+
+        <h3>Editor</h3>
         <ul>
-            <li><b>Select a Target:</b> Use the menu on the left to choose what you want to edit (e.g., <i>Frame</i>, <i>Active Tab</i>, <i>Toolbar</i>).</li>
-            <li><b>Pick a Color:</b>
-                <ul>
-                    <li>Click the <b>Pick</b> button to use a standard color wheel.</li>
-                    <li>Use the <b>RGB/Alpha Sliders</b> on the right for precise adjustments.</li>
-                    <li>Enter a specific <b>Hex Code</b> (e.g., #FF0000FF) directly in the text box.</li>
-                </ul>
-            </li>
-            <li><b>Preview:</b> The central canvas updates instantly. Use the dropdown at the top to check how it looks in <i>Chrome</i> vs <i>Edge</i> vs <i>Brave</i>.</li>
+          <li>Choose Chrome, Brave, or Edge from the preview header.</li>
+          <li>Select a property from the editor menu and use the right panel to change it.</li>
+          <li>Colors support RGB, alpha, hue, hex input, and a native color picker.</li>
         </ul>
 
-        <h3>🖼️ Images & Backgrounds</h3>
+        <h3>Images</h3>
         <ul>
-            <li><b>Drag & Drop:</b> Simply drag any JPG or PNG image directly onto the preview area.
-                <ul>
-                    <li>Drop on the <b>Header</b> to set the Frame Image.</li>
-                    <li>Drop on the <b>Background</b> to set the New Tab Page (NTP) image.</li>
-                </ul>
-            </li>
-            <li><b>Positioning:</b> Once an image is loaded, use the <b>Scale</b>, <b>X</b>, and <b>Y</b> sliders in the "Image Preview" panel to fit it perfectly.</li>
-            <li><b>Remove:</b> Click "Remove Image" to revert to a solid color.</li>
+          <li>Supported formats: PNG, JPG/JPEG, and WebP.</li>
+          <li>Select <b>Frame Image</b> for browser chrome imagery or <b>NTP Image</b> for the page background.</li>
+          <li>Drag an image onto the preview canvas. Header drops select the frame-image target; other canvas areas select the NTP target.</li>
+          <li>Use Scale, X, and Y to position the image without stretching the source.</li>
         </ul>
 
-        <h3>🕵️ Incognito & Modes</h3>
+        <h3>Preview</h3>
         <ul>
-            <li><b>Incognito Mode:</b> Check the "Incognito Mode" box in the top bar to design your private browsing style separately.</li>
-            <li><b>Preview Resolution:</b> Click the resolution buttons (16:9, Ultra) to ensure your theme looks good on different screen sizes.</li>
+          <li>16:9 and 21:9 presets are available, plus Custom resolution.</li>
+          <li>F11 toggles fullscreen preview. Esc exits fullscreen.</li>
+          <li>Incognito mode previews the separate private-window color/image variants.</li>
         </ul>
 
-        <h3>⚡ Shortcuts & Advanced</h3>
-        <ul>
-            <li><b>Undo/Redo:</b> Made a mistake? Press <span class="key">Ctrl+Z</span> to Undo and <span class="key">Ctrl+Y</span> to Redo.</li>
-            <li><b>Fullscreen:</b> Click the <b>⛶</b> icon to inspect your theme in full detail.</li>
-            <li><b>Export:</b> Go to the <b>Export</b> tab to generate a <code>.crx</code> (installable) or <code>.zip</code> (store ready) file.</li>
-        </ul>
+        <h3>Shortcuts</h3>
+        <p><b>Ctrl+Z</b> Undo &nbsp; <b>Ctrl+Y</b> Redo &nbsp; <b>F11</b> Fullscreen &nbsp; <b>Esc</b> Exit fullscreen</p>
 
-        <hr>
-        <h3>📞 Contact & Support</h3>
-        <p>Found a bug or have a suggestion? We want to hear from you!</p>
-        <p>
-            <a href="https://github.com/FreezingFire166/Chromium-Theme-Studio/issues" style="font-size: 16px; font-weight: bold; color: #1A73E8; text-decoration: none;">
-            👉 Open an Issue on GitHub
-            </a>
-        </p>
+        <h3>Export</h3>
+        <p>Use the Export page to generate a Chromium Manifest V3 theme package. ZIP is recommended for normal sharing.</p>
+
+        <h3>Support</h3>
+        <p>Report bugs and feature requests through the repository issue tracker.</p>
         """)
-        layout.addWidget(lbl)
+        layout.addWidget(browser)
