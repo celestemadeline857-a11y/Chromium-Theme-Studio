@@ -57,6 +57,8 @@ class TopBar(QFrame):
 
         self.btn_title = QPushButton("Chromium Theme Studio v3")
         self.btn_title.setProperty("class", "topTitle")
+        self.btn_title.setFixedHeight(32)
+        self.btn_title.setMinimumWidth(170)
         self.btn_title.setCursor(Qt.PointingHandCursor)
         self.btn_title.clicked.connect(self.go_home)
         layout.addWidget(self.btn_title)
@@ -69,6 +71,7 @@ class TopBar(QFrame):
         self.btn_settings.setProperty("class", "topBtn")
         self.btn_settings.setCheckable(True)
         self.btn_settings.setCursor(Qt.PointingHandCursor)
+        self.btn_settings.setFixedSize(92, 32)
         self.btn_settings.clicked.connect(self.toggle_settings_view)
         layout.addWidget(self.btn_settings)
 
@@ -80,13 +83,21 @@ class TopBar(QFrame):
         self.btn_import.clicked.connect(self.load_clicked.emit)
         self.btn_export.clicked.connect(self.export_clicked.emit)
         for b in (self.btn_inject, self.btn_import, self.btn_export):
-            b.setProperty("class", "topBtn"); b.setCursor(Qt.PointingHandCursor); home.addWidget(b)
+            b.setProperty("class", "topBtn")
+            b.setCursor(Qt.PointingHandCursor)
+            b.setFixedSize(104, 32)
+            home.addWidget(b)
+        home.addStretch(1)
 
         self.group_set = QWidget(); settings = QHBoxLayout(self.group_set); settings.setContentsMargins(0,0,0,0); settings.setSpacing(6)
         self.btn_reset = QPushButton("Reset Defaults")
         self.btn_help = QPushButton("Help")
         for b in (self.btn_reset, self.btn_help):
-            b.setProperty("class", "topBtn"); b.setCursor(Qt.PointingHandCursor); settings.addWidget(b)
+            b.setProperty("class", "topBtn")
+            b.setCursor(Qt.PointingHandCursor)
+            b.setFixedSize(104, 32)
+            settings.addWidget(b)
+        settings.addStretch(1)
 
         self.slider_stack.addWidget(self.group_home); self.slider_stack.addWidget(self.group_set)
         layout.addWidget(self.slider_stack, 1)
