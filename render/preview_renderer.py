@@ -28,7 +28,10 @@ class PreviewRenderer:
     def __init__(self, home_page):
         self.w = home_page
         self._pixmap_cache: dict[str, QPixmap] = {}
-        self._render_timer = QTimer(self.w)
+        # Do not parent the timer to the page. PreviewRenderer is also exercised
+        # with lightweight page doubles in the regression suite, and QTimer's
+        # parent must be a QObject. The renderer owns the timer for its lifetime.
+        self._render_timer = QTimer()
         self._render_timer.setSingleShot(True)
         self._render_timer.timeout.connect(self._render_now)
 
@@ -139,7 +142,8 @@ class PreviewRenderer:
             if not pix.isNull():
                 props = self.w.theme_data.get(f"{image_key}_properties", {}) or {}
                 scale = max(0.01, float(props.get("scale", 100)) / 100.0)
-                ox = int(props.get("x", 0)); oy = int(props.get("y", 0))
+                ox = int(props.get("x", 0))
+                oy = int(props.get("y", 0))
                 scaled = pix.scaled(max(1, int(pix.width() * scale)), max(1, int(pix.height() * scale)), Qt.KeepAspectRatio, Qt.SmoothTransformation)
                 src = QRect(0, 0, scaled.width(), min(m.frame_h, scaled.height()))
                 src.moveCenter(QRect(0, 0, w, m.frame_h).center())
