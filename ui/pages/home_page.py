@@ -28,9 +28,19 @@ class FullscreenWindow(QWidget):
     def closeEvent(self, event): self.closed_signal.emit(); super().closeEvent(event)
 
 
+from PySide6.QtCore import Qt, Property, QPropertyAnimation, QEasingCurve
+from PySide6.QtWidgets import QPushButton
+
+
 class MenuHeader(QPushButton):
+    """Compact accordion header matching the navigation tile geometry."""
+
     def __init__(self, text, parent=None):
-        super().__init__(text, parent); self.setCheckable(True); self.setFixedHeight(36); self.setCursor(Qt.PointingHandCursor); self.setProperty("class", "menuHeader")
+        super().__init__(text, parent)
+        self.setCheckable(True)
+        self.setFixedHeight(36)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setProperty("class", "menuHeader")
 
 
 class HomePage(QWidget):
@@ -89,7 +99,7 @@ class HomePage(QWidget):
             if h is header: container.setVisible(checked)
             elif checked: h.blockSignals(True); h.setChecked(False); h.blockSignals(False); container.hide()
     def add_sub_item(self,layout,label,mode_key):
-        btn=BloomTile(label); btn.setFixedHeight(35); btn.clicked.connect(lambda:self.set_mode(mode_key)); layout.addWidget(btn); self.btn_group.addButton(btn); self.menu_tiles.append(btn); self.menu_map[label]=mode_key
+        btn=BloomTile(label); btn.setFixedHeight(36); btn.clicked.connect(lambda:self.set_mode(mode_key)); layout.addWidget(btn); self.btn_group.addButton(btn); self.menu_tiles.append(btn); self.menu_map[label]=mode_key
     def _sync_canvas_layers(self):
         if hasattr(self,"preview_surface"): self.preview_surface.setGeometry(self.canvas.rect())
         if hasattr(self,"guides_layer"): self.guides_layer.setGeometry(self.canvas.rect())
