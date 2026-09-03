@@ -1,0 +1,64 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Compile Python sources
+        shell: pwsh
+        run: python -m compileall -q .
+
+      - name: Run regression tests
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+
+      - name: Build single-file executable
+        shell: pwsh
+        run: |
+          pyinstaller --noconfirm --clean --onefile --windowed --name ChromiumThemeStudio main.py
+          if (!(Test-Path dist/ChromiumThemeStudio.exe)) { throw "EXE build failed" }
+          Compress-Archive -Path dist/ChromiumThemeStudio.exe -DestinationPath ChromiumThemeStudio-Windows.zip -Force
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChromiumThemeStudio-Windows
+          path: ChromiumThemeStudio-Windows.zip
+          if-no-files-found: error
+
+      - name: Attach ZIP to GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ChromiumThemeStudio-Windows.zip
+          generate_release_notes: true
