@@ -21,7 +21,9 @@ class AppStyles:
         QPushButton {{ background: {input_bg}; color: {fg}; border: 1px solid {border}; border-radius: 7px; padding: 6px 11px; min-height: 22px; }}
         QPushButton:hover {{ background: {hover}; }}
         QPushButton:pressed, QPushButton:checked {{ background: {pressed}; border-color: {accent}; }}
-        QPushButton[class="resBtn"] {{ min-height: 24px; }}
+        QPushButton[class="topTitle"], QPushButton[class="topBtn"] {{ min-height: 0; padding: 5px 10px; }}
+        QPushButton[class="menuHeader"] {{ min-height: 0; padding: 5px 10px; text-align: left; font-weight: 600; }}
+        QPushButton[class="resBtn"] {{ min-height: 24px; padding: 4px 10px; }}
         QPushButton[class="dangerBtn"] {{ color: #D93025; border-color: #F3B7B2; background: transparent; }}
         QLineEdit, QComboBox {{ background: {input_bg}; color: {fg}; border: 1px solid {border}; border-radius: 7px; padding: 7px 8px; selection-background-color: {accent}; }}
         QLineEdit:focus, QComboBox:focus {{ border-color: {accent}; }}
