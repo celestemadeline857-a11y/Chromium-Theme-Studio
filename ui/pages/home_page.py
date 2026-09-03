@@ -45,7 +45,7 @@ class MenuHeader(QPushButton):
 
 class HomePage(QWidget):
     def __init__(self, main_window):
-        super().__init__(); self.mw=main_window; self.current_base_mode="frame"; self.current_edit_mode="frame"; self.fs_window=None; self.menu_groups=[]; self.saved_canvas_size=None
+        super().__init__(); self.mw=main_window; self.current_base_mode="frame"; self.aspect_ratio=(16,9); self.current_edit_mode="frame"; self.fs_window=None; self.menu_groups=[]; self.saved_canvas_size=None
         outer=QVBoxLayout(self); outer.setContentsMargins(0,52,0,0); self.layout_inner=QHBoxLayout(); self.layout_inner.setContentsMargins(0,0,0,0); self.layout_inner.setSpacing(0); outer.addLayout(self.layout_inner)
         self.init_ui(); self.renderer=PreviewRenderer(self); self._sync_canvas_layers()
 
@@ -63,8 +63,8 @@ class HomePage(QWidget):
         hdr=QHBoxLayout(); hdr.setSpacing(8); hdr.addWidget(QLabel("Browser:")); self.browser_combo=QComboBox(); self.browser_combo.addItems(["Chrome","Brave","Edge"]); self.browser_combo.currentIndexChanged.connect(self.update_browser_skin); self.browser_combo.setFixedWidth(128); hdr.addWidget(self.browser_combo)
         self.chk_incognito=QCheckBox("Incognito"); self.chk_incognito.toggled.connect(self.on_incognito_toggled); hdr.addWidget(self.chk_incognito); hdr.addStretch(); hdr.addWidget(QLabel("Editor:")); self.theme_toggle=ThemeToggle(); self.theme_toggle.clicked.connect(self.mw.toggle_main_toggle); hdr.addWidget(self.theme_toggle); self.col_prev_layout.addLayout(hdr)
         self.canvas_container=QFrame(); self.canvas_container.setObjectName("canvasContainer"); self.canvas_container.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding); self.canvas_layout=QVBoxLayout(self.canvas_container); self.canvas_layout.setContentsMargins(10,10,10,10); self.canvas_layout.setAlignment(Qt.AlignCenter)
-        self.canvas=QFrame(); self.canvas.setObjectName("previewCanvas"); self.canvas.setFixedSize(1000,562); self.canvas.setAttribute(Qt.WA_StyledBackground,True); self.canvas_layout.addWidget(self.canvas)
-        self.preview_surface=QLabel(self.canvas); self.preview_surface.setObjectName("previewSurface"); self.preview_surface.setAlignment(Qt.AlignCenter); self.preview_surface.setScaledContents(False); self.preview_surface.setAttribute(Qt.WA_TransparentForMouseEvents,True); self.preview_surface.setGeometry(self.canvas.rect())
+        self.canvas=QFrame(); self.canvas.setObjectName("previewCanvas"); self.canvas.setMinimumSize(320,180); self.canvas.setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Preferred); self.canvas.setFixedSize(1000,562); self.canvas.setAttribute(Qt.WA_StyledBackground,True); self.canvas_layout.addWidget(self.canvas)
+        self.preview_surface=QLabel(self.canvas); self.preview_surface.setObjectName("previewSurface"); self.preview_surface.setAlignment(Qt.AlignCenter); self.preview_surface.setScaledContents(False); self.preview_surface.setAttribute(Qt.WA_TransparentForMouseEvents,True); self.preview_surface.setGeometry(self.canvas.rect()); self.preview_surface.raise_()
         self.guides_layer=QFrame(self.canvas); self.guides_layer.setObjectName("guides_layer"); self.guides_layer.setAttribute(Qt.WA_TransparentForMouseEvents); self.guides_layer.setGeometry(self.canvas.rect()); self.col_prev_layout.addWidget(self.canvas_container,1); self._init_resolution_controls(); return container
 
     def _init_resolution_controls(self):
@@ -136,8 +136,27 @@ class HomePage(QWidget):
         path=os.path.abspath(path); pix=QPixmap(path)
         if pix.isNull(): self.mini_preview.setText("Unsupported or corrupted image"); return
         self.p_settings.set_last_import_dir(os.path.dirname(path)); self.theme_data[self.current_edit_mode]=path; self.theme_data.pop(self.current_edit_mode+"_properties",None); self.renderer.invalidate_image_cache(path); self.mini_preview.setPixmap(pix.scaled(self.mini_preview.size(),Qt.KeepAspectRatio,Qt.SmoothTransformation)); self.load_image_params(self.current_edit_mode); self.renderer.apply_image(self.current_edit_mode)
-    def _resize_canvas_and_overlays(self,w,h): self.canvas.setFixedSize(w,h); self._sync_canvas_layers(); self.renderer.apply_image(self.current_edit_mode)
-    def set_aspect_ratio(self,w,h): self._resize_canvas_and_overlays(1000,max(100,int(1000*h/w)))
+    def _fit_canvas_to_viewport(self):
+        if not hasattr(self, "canvas_container") or not self.canvas_container.isVisible():
+            return
+        available_w=max(320,self.canvas_container.width()-20)
+        available_h=max(180,self.canvas_container.height()-20)
+        max_w=min(1000,available_w)
+        max_h=min(800,available_h)
+        ratio=self.aspect_ratio[0]/self.aspect_ratio[1]
+        w=max(320,min(max_w,int(max_h*ratio)))
+        h=max(180,min(max_h,int(w/ratio)))
+        self.canvas.setFixedSize(w,h)
+        self._sync_canvas_layers()
+        if hasattr(self,"renderer"):
+            self.renderer.apply_theme()
+
+    def resizeEvent(self,event):
+        super().resizeEvent(event)
+        self._fit_canvas_to_viewport()
+
+    def _resize_canvas_and_overlays(self,w,h): self.canvas.setFixedSize(max(320,int(w)),max(180,int(h))); self._sync_canvas_layers(); self.renderer.apply_theme()
+    def set_aspect_ratio(self,w,h): self.aspect_ratio=(w,h); self._fit_canvas_to_viewport()
     def open_resolution_dialog(self):
         dlg=ResolutionDialog(self.canvas.width(),self.canvas.height(),self); dlg.resolution_selected.connect(self._resize_canvas_and_overlays); dlg.exec()
     def exit_fullscreen(self): self.fs_window.close() if self.fs_window and self.fs_window.isVisible() else None
