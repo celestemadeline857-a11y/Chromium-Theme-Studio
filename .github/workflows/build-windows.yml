@@ -30,18 +30,24 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          if (Test-Path requirements.txt) {
-            python -m pip install -r requirements.txt
-          } else {
-            python -m pip install PySide6 pyinstaller
-          }
-          python -m pip install pyinstaller
+          python -m pip install -r requirements.txt
 
-      - name: Build executable
+      - name: Compile Python sources
+        shell: pwsh
+        run: python -m compileall -q .
+
+      - name: Run regression tests
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
+
+      - name: Build single-file executable
         shell: pwsh
         run: |
-          pyinstaller --noconfirm --clean --windowed --onedir --name ChromiumThemeStudio main.py
-          Compress-Archive -Path dist/ChromiumThemeStudio/* -DestinationPath ChromiumThemeStudio-Windows.zip -Force
+          pyinstaller --noconfirm --clean --onefile --windowed --name ChromiumThemeStudio main.py
+          if (!(Test-Path dist/ChromiumThemeStudio.exe)) { throw "EXE build failed" }
+          Compress-Archive -Path dist/ChromiumThemeStudio.exe -DestinationPath ChromiumThemeStudio-Windows.zip -Force
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
