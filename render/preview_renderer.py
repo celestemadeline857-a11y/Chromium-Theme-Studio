@@ -143,9 +143,15 @@ class PreviewRenderer:
         p.end()
 
         self.w.preview_surface.setPixmap(target)
-        self.w.preview_surface.setGeometry(0, 0, canvas_w, canvas_h)
+        # Keep the renderer compatible with lightweight test doubles while
+        # using geometry when the real Qt widget provides it.
+        if hasattr(self.w.preview_surface, "setGeometry"):
+            self.w.preview_surface.setGeometry(0, 0, canvas_w, canvas_h)
+        else:
+            self.w.preview_surface.resize(canvas_w, canvas_h)
         self.w.preview_surface.show()
-        self.w.preview_surface.raise_()
+        if hasattr(self.w.preview_surface, "raise_"):
+            self.w.preview_surface.raise_()
         if hasattr(self.w, "guides_layer"):
             self.w.guides_layer.resize(canvas_w, canvas_h)
             self.w.guides_layer.raise_()
