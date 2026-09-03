@@ -16,55 +16,53 @@ v3 focuses on stability, rendering correctness, image handling, and a more consi
 ### Images
 - Supports PNG, JPEG, and WebP image selection and drag-and-drop.
 - Image previews keep aspect ratio instead of stretching into the preview box.
-- Large imports are safely reduced when the resize option is enabled.
 - Image transforms use persistent scale/X/Y properties.
-- Added proper render-cache invalidation when replacing or removing images.
+- Added render-cache invalidation when replacing or removing images.
 
 ### UI/UX
 - Unified light and dark styling into one consistent design system.
 - Standardized buttons, inputs, tabs, group boxes, spacing, and typography.
+- Added a reusable custom-resolution dialog.
 - Simplified the preview toolbar and resolution controls.
 - Cleaner browser selector, Incognito control, and fullscreen workflow.
 
 ### Build and release
 - Added `requirements.txt` for reproducible installs.
 - Added a GitHub Actions workflow at `.github/workflows/build-windows.yml`.
-- The workflow builds a Windows EXE package with PyInstaller.
+- The workflow compiles the Python sources, runs regression tests, then builds a single-file `ChromiumThemeStudio.exe`.
 - Manual builds are available from **Actions → Build Windows EXE → Run workflow**.
-- Pushing a version tag such as `v3.0.0` also produces a GitHub Release attachment.
+- Pushing a version tag such as `v3.0.0` also uploads the build to a GitHub Release.
 
 ## Features
 
-Live browser preview, Chrome/Brave/Edge skins, Incognito variants, color editing with RGBA and hex input, image overlays, drag-and-drop imports, presets, Undo/Redo, fullscreen preview, Spotlight FX, and ZIP/CRX-style theme packaging.
+Live browser preview, Chrome/Brave/Edge skins, Incognito variants, color editing with RGBA and hex input, image overlays, drag-and-drop imports, presets, Undo/Redo, fullscreen preview, Spotlight FX, custom resolution, and ZIP/CRX-style theme packaging.
 
 ## Installation
 
-Download the Windows build from the repository's **Actions** artifacts or a GitHub Release.
-
-Run `ChromiumThemeStudio.exe` from the extracted build directory.
+Download `ChromiumThemeStudio-Windows.zip` from a GitHub Actions run or release, extract it, and run `ChromiumThemeStudio.exe`.
 
 ## Using the editor
 
 Choose a browser from the preview header, select an editable property from the left panel, then adjust its controls on the right.
 
-For images, select **Frame Image** or **NTP Image** and either choose **Select Image** or drop an image directly onto the preview canvas. Use Scale, X, and Y to position it.
+For images, select **Frame Image** or **NTP Image** and either choose **Select Image** or drop an image directly onto the preview canvas. Use Scale, X, and Y to position it without stretching the source.
 
-Use the resolution buttons to switch between 16:9, 21:9, and a custom canvas size. F11 toggles fullscreen preview and Esc exits it.
+Use the resolution buttons for 16:9, 21:9, or **Custom**. F11 toggles fullscreen preview and Esc exits it.
 
 ## Exporting a theme
 
 Open **Export**, enter the theme metadata, choose ZIP or CRX output, select a destination, and generate the package.
 
-The exported theme uses Chromium Manifest V3 theme format.
+The exported package uses Chromium Manifest V3 theme format. The CRX option currently produces the packaged theme archive using the application's existing ZIP-based export path; browser-specific CRX signing/packing is not performed by the editor.
 
 ## Development
 
 ### Requirements
 
-- Windows 10/11 for the packaged application
-- Python 3.10+ for development
+- Python 3.10+
 - PySide6
-- PyInstaller for packaging
+- PyInstaller
+- pytest
 
 ### Run from source
 
@@ -75,33 +73,45 @@ python -m pip install -r requirements.txt
 python main.py
 ```
 
+### Run tests
+
+```bash
+python -m pytest -q
+```
+
 ### Build locally
 
 ```bash
 python -m pip install -r requirements.txt
-pyinstaller --noconfirm --clean --windowed --onedir --name ChromiumThemeStudio main.py
+pyinstaller --noconfirm --clean --onefile --windowed --name ChromiumThemeStudio main.py
 ```
 
-The packaged application will be in `dist/ChromiumThemeStudio/`.
+The executable will be written to `dist/ChromiumThemeStudio.exe`.
 
 ## GitHub Actions build
 
-Go to **Actions → Build Windows EXE → Run workflow**. The resulting `ChromiumThemeStudio-Windows.zip` is uploaded as a workflow artifact.
+Go to **Actions → Build Windows EXE → Run workflow**. The workflow will compile the sources, run the regression tests, build the single-file Windows executable, and upload `ChromiumThemeStudio-Windows.zip` as an artifact.
 
-To create a release build, push a tag such as:
+To trigger the release step, push a version tag such as:
 
 ```bash
 git tag v3.0.0
 git push origin v3.0.0
 ```
 
-The workflow then attaches the Windows ZIP to the generated GitHub Release.
+The tagged workflow attaches the Windows ZIP to the GitHub Release.
 
 ## Versioning
 
 Current version: **v3.0.0**
 
-See [CHANGELOG.md](CHANGELOG.md) for the release history.
+See [CHANGELOG.md](CHANGELOG.md) for the complete release history.
+
+## Repository security
+
+The current connected GitHub integration does not provide repository-visibility, collaborator, or branch-protection/ruleset write operations. Those settings must therefore be applied in GitHub's repository settings by an account with the required administrative permissions.
+
+For the strongest setup after merging v3, make the repository **Private**, then protect `main` with required pull requests/reviews and disable direct pushes for everyone except your chosen administrators.
 
 ## License
 
