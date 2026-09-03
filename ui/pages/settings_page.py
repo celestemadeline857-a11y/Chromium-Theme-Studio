@@ -1,8 +1,9 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QCheckBox, QColorDialog, QComboBox, QFormLayout, QFrame, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QCheckBox, QColorDialog, QComboBox, QFormLayout, QFrame, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QTabWidget, QVBoxLayout, QWidget
 
 from ui.controls.settings_toggle import SettingsToggle
+from ui.controls.smart_slider import SmartSlider
 
 
 class SettingsPage(QWidget):
@@ -55,7 +56,7 @@ class SettingsPage(QWidget):
     def create_group(self,title):
         box=QGroupBox(title); box.setLayout(QVBoxLayout()); box.layout().setContentsMargins(14,18,14,14); return box
     def create_slider(self,min_v,max_v,val,callback):
-        slider=QSlider(Qt.Horizontal); slider.setRange(min_v,max_v); slider.setValue(val); slider.valueChanged.connect(callback); return slider
+        slider=SmartSlider(Qt.Horizontal); slider.setRange(min_v,max_v); slider.setValue(val); slider.valueChanged.connect(callback); return slider
     def create_color_btn(self,color_str,label,callback):
         b=QPushButton(label)
         b.setMinimumHeight(34)
