@@ -24,10 +24,21 @@ class AppStyles:
         QPushButton[class="topTitle"], QPushButton[class="topBtn"] {{ min-height: 0; padding: 5px 10px; }}
         QPushButton[class="menuHeader"] {{ min-height: 0; padding: 5px 10px; text-align: left; font-weight: 600; }}
         QPushButton[class="resBtn"] {{ min-height: 24px; padding: 4px 10px; }}
-        QPushButton[class="dangerBtn"] {{ color: #D93025; border-color: #F3B7B2; background: transparent; }}
+        QPushButton[class="dangerBtn"] {{ color: {fg}; border-color: {border}; background: transparent; }}
         QLineEdit, QComboBox {{ background: {input_bg}; color: {fg}; border: 1px solid {border}; border-radius: 7px; padding: 7px 8px; selection-background-color: {accent}; }}
         QLineEdit:focus, QComboBox:focus {{ border-color: {accent}; }}
         QComboBox QAbstractItemView {{ background: {panel}; color: {fg}; selection-background-color: {pressed}; }}
+        QCheckBox {{ color: {fg}; spacing: 7px; }}
+        QCheckBox::indicator {{ width: 16px; height: 16px; border: 1px solid {border}; border-radius: 4px; background: {input_bg}; }}
+        QCheckBox::indicator:checked {{ background: {accent}; border-color: {accent}; }}
+        QSlider::groove:horizontal {{ height: 6px; background: {border}; border-radius: 3px; }}
+        QSlider::sub-page:horizontal {{ background: {accent}; border-radius: 3px; }}
+        QSlider::add-page:horizontal {{ background: {border}; border-radius: 3px; }}
+        QSlider::handle:horizontal {{ width: 14px; height: 14px; margin: -4px 0; border-radius: 7px; background: {input_bg}; border: 1px solid {accent}; }}
+        QTabBar {{ qproperty-drawBase: 0; }}
+        QTabBar::tab {{ min-width: 76px; min-height: 30px; padding: 5px 12px; }}
+        QTabBar::tab:hover {{ color: {fg}; background: {hover}; border-radius: 5px; }}
+
         QTabWidget::pane {{ border: 1px solid {border}; background: {panel}; border-radius: 8px; }}
         QTabBar::tab {{ background: transparent; color: {muted}; padding: 8px 14px; margin-right: 3px; }}
         QTabBar::tab:selected {{ color: {accent}; font-weight: 700; border-bottom: 2px solid {accent}; }}
