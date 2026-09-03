@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QCheckBox, QColorDialog, QComboBox, QFormLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QProgressBar, QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QCheckBox, QColorDialog, QComboBox, QFormLayout, QFrame, QGroupBox, QHBoxLayout, QLabel, QLineEdit, QPushButton, QScrollArea, QSlider, QTabWidget, QVBoxLayout, QWidget
 
 from ui.controls.settings_toggle import SettingsToggle
 
@@ -18,7 +18,7 @@ class SettingsPage(QWidget):
 
     def _scroll_tab(self, tab):
         layout = QVBoxLayout(tab); layout.setContentsMargins(0, 0, 0, 0)
-        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setFrameShape(QScrollArea.NoFrame)
+        scroll = QScrollArea(); scroll.setWidgetResizable(True); scroll.setFrameShape(QFrame.NoFrame)
         content = QWidget(); body = QVBoxLayout(content); body.setContentsMargins(4, 12, 8, 12); body.setSpacing(14)
         scroll.setWidget(content); layout.addWidget(scroll); return body
 
@@ -57,9 +57,9 @@ class SettingsPage(QWidget):
     def _pick_color(self,key):
         c=QColorDialog.getColor();
         if not c.isValid(): return
-        value=c.name(QColor.HexRgb); setters={"lb":("set_spot_light_base",self.btn_lb),"la":("set_spot_light_active",self.btn_la),"db":("set_spot_dark_base",self.btn_db),"da":("set_spot_dark_active",self.btn_da)}; method,button=setters[key]; getattr(self.p_settings,method)(value); button.setStyleSheet(f"background:{value};border:1px solid #888;border-radius:5px;"); self.update_spotlight_signal()
+        value=c.name(); setters={"lb":("set_spot_light_base",self.btn_lb),"la":("set_spot_light_active",self.btn_la),"db":("set_spot_dark_base",self.btn_db),"da":("set_spot_dark_active",self.btn_da)}; method,button=setters[key]; getattr(self.p_settings,method)(value); button.setStyleSheet(f"background:{value};border:1px solid #888;border-radius:5px;"); self.update_spotlight_signal()
     def update_spotlight_signal(self):
-        mw=self.window();
+        mw=self.window()
         if hasattr(mw,"apply_settings_changes"): mw.apply_settings_changes()
     def _reset_settings(self):
         self.p_settings.settings.clear()
