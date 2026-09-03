@@ -37,7 +37,14 @@ class SettingsPage(QWidget):
         grp = self.create_group("Spotlight FX"); form = QFormLayout(); self.chk_spot = QCheckBox("Enable Spotlight"); self.chk_spot.setChecked(self.p_settings.get_spotlight_enabled()); self.chk_spot.stateChanged.connect(lambda s:self.p_settings.set_spotlight_enabled(bool(s))); form.addRow("Status", self.chk_spot)
         self.slider_rad=self.create_slider(20,200,self.p_settings.get_spot_radius(),self._on_radius_change); self.slider_op=self.create_slider(10,100,int(self.p_settings.get_spot_opacity()*100),self._on_opacity_change); self.slider_str=self.create_slider(0,100,int(self.p_settings.get_spot_strength()*100),self._on_strength_change)
         form.addRow("Beam radius", self.slider_rad); form.addRow("Intensity", self.slider_op); form.addRow("Magnetic pull", self.slider_str); grp.layout().addLayout(form)
-        row=QHBoxLayout(); self.btn_lb=self.create_color_btn(self.p_settings.get_spot_light_base(),lambda:self._pick_color("lb")); self.btn_la=self.create_color_btn(self.p_settings.get_spot_light_active(),lambda:self._pick_color("la")); self.btn_db=self.create_color_btn(self.p_settings.get_spot_dark_base(),lambda:self._pick_color("db")); self.btn_da=self.create_color_btn(self.p_settings.get_spot_dark_active(),lambda:self._pick_color("da")); row.addWidget(self.btn_lb); row.addWidget(self.btn_la); row.addWidget(self.btn_db); row.addWidget(self.btn_da); row.addStretch(); grp.layout().addLayout(row); body.addWidget(grp)
+        row=QHBoxLayout(); row.setSpacing(10)
+        self.btn_lb=self.create_color_btn(self.p_settings.get_spot_light_base(),"Light • idle",lambda:self._pick_color("lb"))
+        self.btn_la=self.create_color_btn(self.p_settings.get_spot_light_active(),"Light • magnet",lambda:self._pick_color("la"))
+        self.btn_db=self.create_color_btn(self.p_settings.get_spot_dark_base(),"Dark • idle",lambda:self._pick_color("db"))
+        self.btn_da=self.create_color_btn(self.p_settings.get_spot_dark_active(),"Dark • magnet",lambda:self._pick_color("da"))
+        for button in (self.btn_lb,self.btn_la,self.btn_db,self.btn_da):
+            row.addWidget(button,1)
+        grp.layout().addLayout(row); body.addWidget(grp)
         grp = self.create_group("Guides"); form=QFormLayout(); self.chk_guides=QCheckBox("Show safe areas"); self.chk_guides.setChecked(self.p_settings.get_show_guides()); self.chk_guides.stateChanged.connect(lambda s:self.p_settings.set_show_guides(bool(s))); form.addRow("Overlay",self.chk_guides); grp.layout().addLayout(form); body.addWidget(grp); body.addStretch()
 
     def init_advanced_tab(self):
@@ -49,15 +56,31 @@ class SettingsPage(QWidget):
         box=QGroupBox(title); box.setLayout(QVBoxLayout()); box.layout().setContentsMargins(14,18,14,14); return box
     def create_slider(self,min_v,max_v,val,callback):
         slider=QSlider(Qt.Horizontal); slider.setRange(min_v,max_v); slider.setValue(val); slider.valueChanged.connect(callback); return slider
-    def create_color_btn(self,color_str,callback):
-        b=QPushButton(); b.setFixedSize(44,30); b.setStyleSheet(f"background:{color_str};border:1px solid #888;border-radius:5px;"); b.clicked.connect(callback); return b
+    def create_color_btn(self,color_str,label,callback):
+        b=QPushButton(label)
+        b.setMinimumHeight(34)
+        b.setToolTip(f"{label}: {color_str}. Click to choose a new color.")
+        self._style_color_button(b, color_str)
+        b.clicked.connect(callback)
+        return b
+
+    def _style_color_button(self, button, color_str):
+        color = QColor(color_str)
+        luminance = 0.2126*color.red() + 0.7152*color.green() + 0.0722*color.blue()
+        text = "#111111" if luminance > 150 else "#FFFFFF"
+        border = "#666666" if luminance > 150 else "#AAAAAA"
+        button.setStyleSheet(
+            f"QPushButton {{ background:{color_str}; color:{text}; border:1px solid {border}; "
+            f"border-radius:7px; padding:5px 8px; font-weight:600; }}"
+            f"QPushButton:hover {{ border:2px solid palette(highlight); }}"
+        )
     def _on_radius_change(self,val): self.p_settings.set_spot_radius(val); self.update_spotlight_signal()
     def _on_strength_change(self,val): self.p_settings.set_spot_strength(val/100.0); self.update_spotlight_signal()
     def _on_opacity_change(self,val): self.p_settings.set_spot_opacity(val/100.0); self.update_spotlight_signal()
     def _pick_color(self,key):
         c=QColorDialog.getColor();
         if not c.isValid(): return
-        value=c.name(); setters={"lb":("set_spot_light_base",self.btn_lb),"la":("set_spot_light_active",self.btn_la),"db":("set_spot_dark_base",self.btn_db),"da":("set_spot_dark_active",self.btn_da)}; method,button=setters[key]; getattr(self.p_settings,method)(value); button.setStyleSheet(f"background:{value};border:1px solid #888;border-radius:5px;"); self.update_spotlight_signal()
+        value=c.name(); setters={"lb":("set_spot_light_base",self.btn_lb),"la":("set_spot_light_active",self.btn_la),"db":("set_spot_dark_base",self.btn_db),"da":("set_spot_dark_active",self.btn_da)}; method,button=setters[key]; getattr(self.p_settings,method)(value); self._style_color_button(button, value); button.setToolTip(f"{button.text()}: {value}. Click to choose a new color."); self.update_spotlight_signal()
     def update_spotlight_signal(self):
         mw=self.window()
         if hasattr(mw,"apply_settings_changes"): mw.apply_settings_changes()
