@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QMouseEvent, QWheelEvent
-from PySide6.QtWidgets import QSlider
+from PySide6.QtWidgets import QSlider, QStyle
 
 
 class SmartSlider(QSlider):
@@ -18,7 +18,7 @@ class SmartSlider(QSlider):
 
     def _set_from_position(self, x):
         groove = max(1, self.width() - self.style().pixelMetric(
-            self.style().PixelMetric.PM_SliderLength, None, self
+            QStyle.PixelMetric.PM_SliderLength, None, self
         ))
         length = self.style().pixelMetric(
             self.style().PixelMetric.PM_SliderLength, None, self
